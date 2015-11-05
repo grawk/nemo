@@ -24,7 +24,8 @@ var async = require('async'),
   confit = require('confit'),
   yargs = require('yargs'),
   handlers = require('shortstop-handlers'),
-  webdriver = require('selenium-webdriver');
+  webdriver = require('selenium-webdriver'),
+  events = new webdriver.EventEmitter();
 
 error.log = console.error.bind(console);
 
@@ -41,6 +42,7 @@ function Nemo(_basedir, _configOverride, _cb) {
   var basedir, configOverride, cb;
 
   var nemo = {};
+
   var confitOptions = {};
   //hack because confit doesn't JSON.parse environment variables before merging
   //look into using shorstop handler or pseudo-handler in place of this
@@ -140,6 +142,7 @@ var setup = function setup(config, cb) {
     'data': config.get('data'),
     'driver': {},
     'wd': webdriver,
+    'events': events,
     '_config': config 
   };
   //config is for registering plugins
@@ -201,6 +204,7 @@ var driversetup = function (_nemo) {
       }
       //set driver
       _nemo.driver = _driver;
+      events.emit('nemo.driverstart', _nemo);
       callback(null);
 
     });
